@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, devtools } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
-import type { Goal, GoalStatus, GoalTargetType } from '../types';
+import type { Goal, GoalStatus, GoalTargetType, Workout } from '../types';
 
 /**
  * Goal form data without id, currentValue, status, and timestamps
@@ -39,6 +39,7 @@ interface GoalActions {
   getActiveGoals: () => Goal[];
   getCompletedGoals: () => Goal[];
   getGoalProgress: (id: string) => number;
+  syncGoalsWithWorkouts: (workouts: Workout[]) => void;
   clearError: () => void;
 }
 
@@ -258,6 +259,66 @@ export const useGoalStore = create<GoalState & GoalActions>()(
           const goal = get().getGoalById(id);
           if (!goal) return 0;
           return Math.min(100, (goal.currentValue / goal.targetValue) * 100);
+        },
+
+        /**
+         * Sync all active goals with workout data
+         * Automatically calculates progress based on workouts within goal date range
+         */
+        syncGoalsWithWorkouts: (workouts: Workout[]) => {
+          set(
+            (state) => ({
+              goals: state.goals.map((goal) => {
+                // Only sync active goals
+                if (goal.status !== 'active') return goal;
+
+                // Filter workouts within goal date range
+                const relevantWorkouts = workouts.filter((workout) => {
+                  const workoutDate = new Date(workout.date);
+                  const startDate = new Date(goal.startDate);
+                  const endDate = new Date(goal.endDate);
+                  return workoutDate >= startDate && workoutDate <= endDate;
+                });
+
+                // Calculate current value based on target type
+                let currentValue = 0;
+                switch (goal.targetType) {
+                  case 'workouts_count':
+                    currentValue = relevantWorkouts.length;
+                    break;
+                  case 'total_duration':
+                    currentValue = relevantWorkouts.reduce(
+                      (sum, w) => sum + w.duration,
+                      0
+                    );
+                    break;
+                  case 'calories_burned':
+                    currentValue = relevantWorkouts.reduce(
+                      (sum, w) => sum + w.calories,
+                      0
+                    );
+                    break;
+                  case 'weight_lifted':
+                    currentValue = relevantWorkouts.reduce(
+                      (sum, w) => sum + (w.weight || 0) * (w.sets || 1) * (w.reps || 1),
+                      0
+                    );
+                    break;
+                }
+
+                // Check if goal is completed
+                const isComplete = currentValue >= goal.targetValue;
+
+                return {
+                  ...goal,
+                  currentValue,
+                  status: isComplete ? 'completed' as GoalStatus : goal.status,
+                };
+              }),
+            }),
+            false,
+            'syncGoalsWithWorkouts'
+          );
         },
 
         /**

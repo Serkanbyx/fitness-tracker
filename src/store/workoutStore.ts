@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, devtools } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
 import type { Workout, ExerciseType, IntensityLevel } from '../types';
+import { useGoalStore } from './goalStore';
 
 /**
  * Workout form data without id and timestamps
@@ -116,6 +117,7 @@ export const useWorkoutStore = create<WorkoutState & WorkoutActions>()(
 
         /**
          * Add a new workout to the store
+         * Automatically syncs goal progress after adding
          */
         addWorkout: (data: WorkoutFormData) => {
           const newWorkout: Workout = {
@@ -131,10 +133,15 @@ export const useWorkoutStore = create<WorkoutState & WorkoutActions>()(
             false,
             'addWorkout'
           );
+
+          // Sync goals with updated workouts
+          const { syncGoalsWithWorkouts } = useGoalStore.getState();
+          syncGoalsWithWorkouts(get().workouts);
         },
 
         /**
          * Update an existing workout by id
+         * Automatically syncs goal progress after updating
          */
         updateWorkout: (id: string, data: Partial<WorkoutFormData>) => {
           set(
@@ -146,10 +153,15 @@ export const useWorkoutStore = create<WorkoutState & WorkoutActions>()(
             false,
             'updateWorkout'
           );
+
+          // Sync goals with updated workouts
+          const { syncGoalsWithWorkouts } = useGoalStore.getState();
+          syncGoalsWithWorkouts(get().workouts);
         },
 
         /**
          * Delete a workout by id
+         * Automatically syncs goal progress after deleting
          */
         deleteWorkout: (id: string) => {
           set(
@@ -159,6 +171,10 @@ export const useWorkoutStore = create<WorkoutState & WorkoutActions>()(
             false,
             'deleteWorkout'
           );
+
+          // Sync goals with updated workouts
+          const { syncGoalsWithWorkouts } = useGoalStore.getState();
+          syncGoalsWithWorkouts(get().workouts);
         },
 
         /**
