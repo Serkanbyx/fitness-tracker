@@ -1,9 +1,16 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Calculator } from 'lucide-react';
 import { workoutSchema, type WorkoutFormData } from '../../lib/validations';
-import { exerciseTypeConfig, intensityConfig, getTodayString } from '../../lib/utils';
+import { 
+  exerciseTypeConfig, 
+  intensityConfig, 
+  getTodayString,
+  calculateCalories,
+  calculateStrengthCalories 
+} from '../../lib/utils';
 import { Button } from '../ui';
-import type { Workout } from '../../types';
+import type { Workout, ExerciseType, IntensityLevel } from '../../types';
 
 interface WorkoutFormProps {
   onSubmit: (data: WorkoutFormData) => void;
@@ -25,6 +32,7 @@ const WorkoutForm = ({
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<WorkoutFormData>({
     resolver: zodResolver(workoutSchema),
@@ -56,7 +64,44 @@ const WorkoutForm = ({
   });
 
   const exerciseType = watch('exerciseType');
+  const intensity = watch('intensity');
+  const duration = watch('duration');
+  const sets = watch('sets');
+  const reps = watch('reps');
+  const weight = watch('weight');
   const isStrengthExercise = exerciseType === 'strength';
+
+  /**
+   * Auto-calculate calories based on exercise type, intensity, and duration
+   */
+  const handleAutoCalculate = () => {
+    if (!exerciseType || !intensity || !duration) {
+      return;
+    }
+
+    let calories: number;
+    
+    if (exerciseType === 'strength') {
+      calories = calculateStrengthCalories(
+        intensity as IntensityLevel,
+        duration,
+        weight,
+        sets,
+        reps
+      );
+    } else {
+      calories = calculateCalories(
+        exerciseType as ExerciseType,
+        intensity as IntensityLevel,
+        duration
+      );
+    }
+
+    setValue('calories', calories, { shouldValidate: true });
+  };
+
+  // Check if auto-calculate is possible
+  const canAutoCalculate = exerciseType && intensity && duration && duration > 0;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -143,23 +188,37 @@ const WorkoutForm = ({
           <label htmlFor="calories" className="label">
             Calories Burned *
           </label>
-          <input
-            id="calories"
-            type="number"
-            min="1"
-            className={`input ${errors.calories ? 'input-error' : ''}`}
-            placeholder="250"
-            {...register('calories', { valueAsNumber: true })}
-          />
+          <div className="flex gap-2">
+            <input
+              id="calories"
+              type="number"
+              min="1"
+              className={`input flex-1 ${errors.calories ? 'input-error' : ''}`}
+              placeholder="250"
+              {...register('calories', { valueAsNumber: true })}
+            />
+            <button
+              type="button"
+              onClick={handleAutoCalculate}
+              disabled={!canAutoCalculate}
+              className="px-3 py-2 bg-primary-100 text-primary-700 rounded-lg hover:bg-primary-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors dark:bg-primary-900/50 dark:text-primary-300 dark:hover:bg-primary-800/50"
+              title={canAutoCalculate ? 'Auto-calculate calories' : 'Fill exercise type, intensity, and duration first'}
+            >
+              <Calculator className="w-5 h-5" />
+            </button>
+          </div>
           {errors.calories && (
             <p className="error-message">{errors.calories.message}</p>
           )}
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            Click calculator to auto-estimate based on MET values
+          </p>
         </div>
       </div>
 
       {/* Strength Training Fields (conditional) */}
       {isStrengthExercise && (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
           <div>
             <label htmlFor="sets" className="label">
               Sets
@@ -240,7 +299,7 @@ const WorkoutForm = ({
       </div>
 
       {/* Form Actions */}
-      <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+      <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
         <Button type="button" variant="secondary" onClick={onCancel}>
           Cancel
         </Button>

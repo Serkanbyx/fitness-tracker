@@ -107,7 +107,7 @@ const Dashboard = () => {
       {/* Page Header */}
       <div>
         <h1 className="page-title">Dashboard</h1>
-        <p className="text-gray-500 mt-1">
+        <p className="text-gray-500 dark:text-gray-400 mt-1">
           Track your fitness journey and monitor your progress
         </p>
       </div>
@@ -172,13 +172,13 @@ const Dashboard = () => {
                     <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="day" stroke="#9ca3af" fontSize={12} />
-                <YAxis stroke="#9ca3af" fontSize={12} />
+                <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
+                <XAxis dataKey="day" className="fill-gray-500 dark:fill-gray-400" fontSize={12} />
+                <YAxis className="fill-gray-500 dark:fill-gray-400" fontSize={12} />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: '#fff',
-                    border: '1px solid #e5e7eb',
+                    backgroundColor: 'var(--tooltip-bg, #fff)',
+                    border: '1px solid var(--tooltip-border, #e5e7eb)',
                     borderRadius: '8px',
                   }}
                 />
@@ -202,13 +202,13 @@ const Dashboard = () => {
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={weeklySummary}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="day" stroke="#9ca3af" fontSize={12} />
-                <YAxis stroke="#9ca3af" fontSize={12} />
+                <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
+                <XAxis dataKey="day" className="fill-gray-500 dark:fill-gray-400" fontSize={12} />
+                <YAxis className="fill-gray-500 dark:fill-gray-400" fontSize={12} />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: '#fff',
-                    border: '1px solid #e5e7eb',
+                    backgroundColor: 'var(--tooltip-bg, #fff)',
+                    border: '1px solid var(--tooltip-border, #e5e7eb)',
                     borderRadius: '8px',
                   }}
                   formatter={(value: number) => [`${value} min`, 'Duration']}
@@ -257,7 +257,7 @@ const Dashboard = () => {
               </ResponsiveContainer>
             </div>
           ) : (
-            <div className="h-64 flex items-center justify-center text-gray-500">
+            <div className="h-64 flex items-center justify-center text-gray-500 dark:text-gray-400">
               No workout data available
             </div>
           )}
@@ -274,15 +274,15 @@ const Dashboard = () => {
                   (goal.currentValue / goal.targetValue) * 100
                 );
                 return (
-                  <div key={goal.id} className="p-4 bg-gray-50 rounded-lg">
+                  <div key={goal.id} className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                     <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-medium text-gray-900">{goal.title}</h3>
-                      <span className="text-sm font-medium text-primary-600">
+                      <h3 className="font-medium text-gray-900 dark:text-white">{goal.title}</h3>
+                      <span className="text-sm font-medium text-primary-600 dark:text-primary-400">
                         {progress.toFixed(0)}%
                       </span>
                     </div>
                     <ProgressBar value={goal.currentValue} max={goal.targetValue} />
-                    <p className="text-sm text-gray-500 mt-2">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
                       {goal.currentValue} / {goal.targetValue}
                     </p>
                   </div>
@@ -290,7 +290,7 @@ const Dashboard = () => {
               })}
             </div>
           ) : (
-            <div className="h-64 flex items-center justify-center text-gray-500">
+            <div className="h-64 flex items-center justify-center text-gray-500 dark:text-gray-400">
               No active goals
             </div>
           )}

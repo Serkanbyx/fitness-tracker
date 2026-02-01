@@ -1,6 +1,108 @@
 import type { ExerciseType, IntensityLevel, GoalTargetType, Workout } from '../types';
 
 /**
+ * MET (Metabolic Equivalent of Task) values for exercises
+ * MET values from Compendium of Physical Activities
+ * Reference: https://sites.google.com/site/compendiumofphysicalactivities/
+ */
+export const metValues: Record<ExerciseType, Record<IntensityLevel, number>> = {
+  cardio: {
+    low: 4.0,    // Light walking, slow cycling
+    medium: 7.0, // Jogging, moderate cycling
+    high: 10.0,  // Running, HIIT, fast cycling
+  },
+  strength: {
+    low: 3.0,    // Light weight training
+    medium: 5.0, // Moderate weight training
+    high: 6.0,   // Vigorous weight training
+  },
+  flexibility: {
+    low: 2.5,    // Stretching, light yoga
+    medium: 3.0, // Moderate yoga, pilates
+    high: 4.0,   // Power yoga, intense stretching
+  },
+  balance: {
+    low: 2.0,    // Standing balance exercises
+    medium: 3.0, // Tai chi, balance training
+    high: 4.5,   // Dynamic balance exercises
+  },
+  sports: {
+    low: 4.0,    // Recreational sports
+    medium: 6.0, // Moderate sports (tennis, swimming)
+    high: 9.0,   // Intense sports (basketball, soccer, HIIT)
+  },
+};
+
+/**
+ * Default body weight in kg for calorie calculation
+ * User can potentially customize this in the future
+ */
+const DEFAULT_BODY_WEIGHT = 70; // kg
+
+/**
+ * Calculate calories burned during exercise
+ * Formula: Calories = MET × Weight(kg) × Duration(hours)
+ * 
+ * @param exerciseType - Type of exercise
+ * @param intensity - Intensity level
+ * @param durationMinutes - Duration in minutes
+ * @param bodyWeight - Body weight in kg (optional, defaults to 70kg)
+ * @returns Estimated calories burned (rounded to nearest integer)
+ */
+export const calculateCalories = (
+  exerciseType: ExerciseType,
+  intensity: IntensityLevel,
+  durationMinutes: number,
+  bodyWeight: number = DEFAULT_BODY_WEIGHT
+): number => {
+  const met = metValues[exerciseType]?.[intensity] ?? 5.0;
+  const durationHours = durationMinutes / 60;
+  const calories = met * bodyWeight * durationHours;
+  return Math.round(calories);
+};
+
+/**
+ * Calculate calories for strength training with additional weight factor
+ * Considers the weight lifted as an additional intensity factor
+ * 
+ * @param intensity - Base intensity level
+ * @param durationMinutes - Duration in minutes
+ * @param weightLifted - Weight lifted in kg (optional)
+ * @param sets - Number of sets (optional)
+ * @param reps - Number of reps (optional)
+ * @param bodyWeight - Body weight in kg (optional)
+ * @returns Estimated calories burned
+ */
+export const calculateStrengthCalories = (
+  intensity: IntensityLevel,
+  durationMinutes: number,
+  weightLifted?: number,
+  sets?: number,
+  reps?: number,
+  bodyWeight: number = DEFAULT_BODY_WEIGHT
+): number => {
+  // Base calculation
+  let calories = calculateCalories('strength', intensity, durationMinutes, bodyWeight);
+  
+  // Add bonus for weight lifted (higher weight = more calories)
+  if (weightLifted && weightLifted > 0) {
+    // ~2% increase per 10kg lifted
+    const weightFactor = 1 + (weightLifted / 500);
+    calories = Math.round(calories * weightFactor);
+  }
+  
+  // Add small bonus for volume (sets × reps)
+  if (sets && reps) {
+    const volume = sets * reps;
+    // ~1% increase per 10 total reps
+    const volumeFactor = 1 + (volume / 1000);
+    calories = Math.round(calories * volumeFactor);
+  }
+  
+  return calories;
+};
+
+/**
  * Exercise type display names and colors
  */
 export const exerciseTypeConfig: Record<ExerciseType, { label: string; color: string }> = {

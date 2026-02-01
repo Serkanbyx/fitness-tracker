@@ -93,7 +93,7 @@ const Workouts = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="page-title">Workouts</h1>
-          <p className="text-gray-500 mt-1">
+          <p className="text-gray-500 dark:text-gray-400 mt-1">
             Log and manage your workout sessions
           </p>
         </div>
@@ -186,9 +186,9 @@ const Workouts = () => {
         size="sm"
       >
         <div className="space-y-4">
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-300">
             Are you sure you want to delete{' '}
-            <span className="font-medium text-gray-900">
+            <span className="font-medium text-gray-900 dark:text-white">
               "{workoutToDelete?.name}"
             </span>
             ? This action cannot be undone.
@@ -238,10 +238,10 @@ const WorkoutCard = ({ workout, onEdit, onDelete }: WorkoutCardProps) => {
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div>
-              <h3 className="font-semibold text-gray-900 truncate">
+              <h3 className="font-semibold text-gray-900 dark:text-white truncate">
                 {workout.name}
               </h3>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 {formatRelativeDate(workout.date)} • {formatDate(workout.date)}
               </p>
             </div>
@@ -249,14 +249,14 @@ const WorkoutCard = ({ workout, onEdit, onDelete }: WorkoutCardProps) => {
             <div className="hidden sm:flex items-center gap-2">
               <button
                 onClick={onEdit}
-                className="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+                className="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/50 rounded-lg transition-colors"
                 aria-label="Edit workout"
               >
                 <Edit2 className="w-4 h-4" />
               </button>
               <button
                 onClick={onDelete}
-                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/50 rounded-lg transition-colors"
                 aria-label="Delete workout"
               >
                 <Trash2 className="w-4 h-4" />
@@ -284,14 +284,14 @@ const WorkoutCard = ({ workout, onEdit, onDelete }: WorkoutCardProps) => {
             >
               {intensityLevelConfig.label} Intensity
             </span>
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-gray-600 dark:text-gray-300">
               {formatDuration(workout.duration)}
             </span>
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-gray-600 dark:text-gray-300">
               {workout.calories} cal
             </span>
             {workout.sets && workout.reps && (
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-gray-600 dark:text-gray-300">
                 {workout.sets}×{workout.reps}
                 {workout.weight && ` @ ${workout.weight}kg`}
               </span>
@@ -300,14 +300,14 @@ const WorkoutCard = ({ workout, onEdit, onDelete }: WorkoutCardProps) => {
 
           {/* Notes */}
           {workout.notes && (
-            <p className="text-sm text-gray-500 mt-2 line-clamp-2">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 line-clamp-2">
               {workout.notes}
             </p>
           )}
         </div>
 
         {/* Mobile Actions */}
-        <div className="flex sm:hidden items-center gap-2 pt-2 border-t border-gray-100">
+        <div className="flex sm:hidden items-center gap-2 pt-2 border-t border-gray-100 dark:border-gray-700">
           <Button
             variant="secondary"
             size="sm"

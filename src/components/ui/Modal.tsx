@@ -65,19 +65,19 @@ const Modal = ({ isOpen, onClose, title, children, size = 'md' }: ModalProps) =>
     >
       <div
         className={clsx(
-          'w-full bg-white rounded-2xl shadow-xl',
+          'w-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl',
           'transform transition-all duration-200',
           sizes[size]
         )}
       >
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <h2 id="modal-title" className="text-lg font-semibold text-gray-900">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h2 id="modal-title" className="text-lg font-semibold text-gray-900 dark:text-white">
             {title}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:text-gray-300 dark:hover:bg-gray-700 rounded-lg transition-colors"
             aria-label="Close modal"
           >
             <X className="w-5 h-5" />
