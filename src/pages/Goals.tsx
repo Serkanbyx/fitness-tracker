@@ -9,8 +9,9 @@ import {
   RotateCcw,
   TrendingUp,
   Calendar,
+  RefreshCw,
 } from 'lucide-react';
-import { useGoalStore } from '../store';
+import { useGoalStore, useWorkoutStore } from '../store';
 import { Button, Modal, EmptyState, ProgressBar } from '../components/ui';
 import { GoalForm } from '../components/forms';
 import { goalTargetConfig, formatDate } from '../lib/utils';
@@ -21,9 +22,21 @@ import type { Goal, GoalStatus } from '../types';
  * Status badge colors and labels
  */
 const statusConfig: Record<GoalStatus, { label: string; color: string; bg: string }> = {
-  active: { label: 'Active', color: 'text-blue-700', bg: 'bg-blue-100' },
-  completed: { label: 'Completed', color: 'text-green-700', bg: 'bg-green-100' },
-  cancelled: { label: 'Cancelled', color: 'text-gray-700', bg: 'bg-gray-100' },
+  active: {
+    label: 'Active',
+    color: 'text-blue-700 dark:text-blue-300',
+    bg: 'bg-blue-100 dark:bg-blue-900/50',
+  },
+  completed: {
+    label: 'Completed',
+    color: 'text-green-700 dark:text-green-300',
+    bg: 'bg-green-100 dark:bg-green-900/50',
+  },
+  cancelled: {
+    label: 'Cancelled',
+    color: 'text-gray-700 dark:text-gray-300',
+    bg: 'bg-gray-100 dark:bg-gray-700',
+  },
 };
 
 /**
@@ -37,10 +50,12 @@ const Goals = () => {
     updateGoal,
     deleteGoal,
     updateProgress,
+    enableAutoTracking,
     completeGoal,
     cancelGoal,
     reactivateGoal,
   } = useGoalStore();
+  const { workouts } = useWorkoutStore();
 
   // Modal states
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -141,7 +156,7 @@ const Goals = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="page-title">Goals</h1>
-          <p className="text-gray-500 mt-1">
+          <p className="text-gray-500 dark:text-gray-400 mt-1">
             Set fitness goals and track your progress
           </p>
         </div>
@@ -153,30 +168,30 @@ const Goals = () => {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="card flex items-center gap-4">
-          <div className="p-3 bg-blue-100 rounded-xl">
-            <Target className="w-6 h-6 text-blue-600" />
+          <div className="p-3 bg-blue-100 dark:bg-blue-900/50 rounded-xl">
+            <Target className="w-6 h-6 text-blue-600 dark:text-blue-400" />
           </div>
           <div>
-            <p className="text-sm text-gray-500">Active Goals</p>
-            <p className="text-2xl font-bold text-gray-900">{stats.active}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Active Goals</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.active}</p>
           </div>
         </div>
         <div className="card flex items-center gap-4">
-          <div className="p-3 bg-green-100 rounded-xl">
-            <CheckCircle2 className="w-6 h-6 text-green-600" />
+          <div className="p-3 bg-green-100 dark:bg-green-900/50 rounded-xl">
+            <CheckCircle2 className="w-6 h-6 text-green-600 dark:text-green-400" />
           </div>
           <div>
-            <p className="text-sm text-gray-500">Completed</p>
-            <p className="text-2xl font-bold text-gray-900">{stats.completed}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Completed</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.completed}</p>
           </div>
         </div>
         <div className="card flex items-center gap-4">
-          <div className="p-3 bg-primary-100 rounded-xl">
-            <TrendingUp className="w-6 h-6 text-primary-600" />
+          <div className="p-3 bg-primary-100 dark:bg-primary-900/50 rounded-xl">
+            <TrendingUp className="w-6 h-6 text-primary-600 dark:text-primary-400" />
           </div>
           <div>
-            <p className="text-sm text-gray-500">Avg. Progress</p>
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="text-sm text-gray-500 dark:text-gray-400">Avg. Progress</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">
               {stats.avgProgress.toFixed(0)}%
             </p>
           </div>
@@ -191,8 +206,8 @@ const Goals = () => {
             onClick={() => setStatusFilter(status)}
             className={`px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-colors ${
               statusFilter === status
-                ? 'bg-primary-100 text-primary-700'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ? 'bg-primary-100 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
             }`}
           >
             {status === 'all' ? 'All Goals' : statusConfig[status].label}
@@ -216,6 +231,7 @@ const Goals = () => {
               onComplete={() => completeGoal(goal.id)}
               onCancel={() => cancelGoal(goal.id)}
               onReactivate={() => reactivateGoal(goal.id)}
+              onEnableAutoTracking={() => enableAutoTracking(goal.id, workouts)}
             />
           ))}
         </div>
@@ -257,9 +273,9 @@ const Goals = () => {
         size="sm"
       >
         <div className="space-y-4">
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-300">
             Are you sure you want to delete{' '}
-            <span className="font-medium text-gray-900">
+            <span className="font-medium text-gray-900 dark:text-white">
               "{goalToDelete?.title}"
             </span>
             ? This action cannot be undone.
@@ -288,14 +304,18 @@ const Goals = () => {
         {progressModalGoal && (
           <div className="space-y-4">
             <div>
-              <p className="text-sm text-gray-500 mb-2">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
                 {progressModalGoal.title}
               </p>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 Target: {progressModalGoal.targetValue}{' '}
                 {goalTargetConfig[progressModalGoal.targetType].unit}
               </p>
             </div>
+            <p className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 rounded-lg p-2">
+              Setting progress manually stops automatic tracking from your
+              workouts for this goal.
+            </p>
             <div>
               <label htmlFor="progress" className="label">
                 Current Progress (
@@ -338,6 +358,7 @@ interface GoalCardProps {
   onComplete: () => void;
   onCancel: () => void;
   onReactivate: () => void;
+  onEnableAutoTracking: () => void;
 }
 
 const GoalCard = ({
@@ -348,6 +369,7 @@ const GoalCard = ({
   onComplete,
   onCancel,
   onReactivate,
+  onEnableAutoTracking,
 }: GoalCardProps) => {
   const progress = Math.min(100, (goal.currentValue / goal.targetValue) * 100);
   const targetConfig = goalTargetConfig[goal.targetType];
@@ -365,22 +387,37 @@ const GoalCard = ({
       <div className="flex items-start justify-between gap-4 mb-4">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="font-semibold text-gray-900">{goal.title}</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white">{goal.title}</h3>
             <span
               className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${status.color} ${status.bg}`}
             >
               {status.label}
             </span>
+            {isActive && goal.isManualProgress && (
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-medium text-amber-700 bg-amber-100 dark:text-amber-300 dark:bg-amber-900/50">
+                Manual
+              </span>
+            )}
           </div>
           {goal.description && (
-            <p className="text-sm text-gray-500 mt-1">{goal.description}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{goal.description}</p>
           )}
         </div>
         <div className="flex items-center gap-2">
+          {isActive && goal.isManualProgress && (
+            <button
+              onClick={onEnableAutoTracking}
+              className="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 dark:hover:text-primary-400 dark:hover:bg-primary-900/50 rounded-lg transition-colors"
+              aria-label="Resume automatic tracking"
+              title="Resume automatic tracking from workouts"
+            >
+              <RefreshCw className="w-4 h-4" />
+            </button>
+          )}
           {isActive && (
             <button
               onClick={onUpdateProgress}
-              className="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+              className="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 dark:hover:text-primary-400 dark:hover:bg-primary-900/50 rounded-lg transition-colors"
               aria-label="Update progress"
               title="Update Progress"
             >
@@ -389,14 +426,14 @@ const GoalCard = ({
           )}
           <button
             onClick={onEdit}
-            className="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+            className="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 dark:hover:text-primary-400 dark:hover:bg-primary-900/50 rounded-lg transition-colors"
             aria-label="Edit goal"
           >
             <Edit2 className="w-4 h-4" />
           </button>
           <button
             onClick={onDelete}
-            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-400 dark:hover:bg-red-900/50 rounded-lg transition-colors"
             aria-label="Delete goal"
           >
             <Trash2 className="w-4 h-4" />
@@ -407,10 +444,10 @@ const GoalCard = ({
       {/* Progress Section */}
       <div className="mb-4">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm font-medium text-gray-700">
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
             {goal.currentValue} / {goal.targetValue} {targetConfig.unit}
           </span>
-          <span className="text-sm font-medium text-primary-600">
+          <span className="text-sm font-medium text-primary-600 dark:text-primary-400">
             {progress.toFixed(0)}%
           </span>
         </div>
@@ -418,14 +455,14 @@ const GoalCard = ({
       </div>
 
       {/* Footer */}
-      <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-gray-100">
-        <div className="flex items-center gap-4 text-sm text-gray-500">
+      <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+        <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
           <span className="flex items-center gap-1">
             <Calendar className="w-4 h-4" />
             {formatDate(goal.startDate)} - {formatDate(goal.endDate)}
           </span>
           {isActive && (
-            <span className={daysRemaining < 7 ? 'text-red-600 font-medium' : ''}>
+            <span className={daysRemaining < 7 ? 'text-red-600 dark:text-red-400 font-medium' : ''}>
               {daysRemaining > 0 ? `${daysRemaining} days left` : 'Overdue'}
             </span>
           )}

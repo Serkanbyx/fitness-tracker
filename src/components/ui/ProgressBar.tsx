@@ -54,14 +54,14 @@ const ProgressBar = ({
     <div className="w-full">
       {showLabel && (
         <div className="flex justify-between items-center mb-1">
-          <span className="text-sm font-medium text-gray-700">Progress</span>
-          <span className="text-sm font-medium text-gray-500">
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Progress</span>
+          <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
             {percentage.toFixed(0)}%
           </span>
         </div>
       )}
       <div
-        className={clsx('w-full bg-gray-200 rounded-full overflow-hidden', sizes[size])}
+        className={clsx('w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden', sizes[size])}
         role="progressbar"
         aria-valuenow={value}
         aria-valuemin={0}

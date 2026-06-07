@@ -73,27 +73,27 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
       // Default error UI
       return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
+          <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 text-center">
             {/* Error Icon */}
-            <div className="w-16 h-16 mx-auto mb-6 bg-red-100 rounded-full flex items-center justify-center">
-              <AlertTriangle className="w-8 h-8 text-red-600" />
+            <div className="w-16 h-16 mx-auto mb-6 bg-red-100 dark:bg-red-900/50 rounded-full flex items-center justify-center">
+              <AlertTriangle className="w-8 h-8 text-red-600 dark:text-red-400" />
             </div>
 
             {/* Error Title */}
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
               Something went wrong
             </h1>
 
             {/* Error Message */}
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 dark:text-gray-300 mb-6">
               We encountered an unexpected error. Don't worry, your data is safe.
             </p>
 
             {/* Error Details (Development only) */}
             {import.meta.env.DEV && error && (
-              <div className="mb-6 p-4 bg-gray-100 rounded-lg text-left overflow-auto max-h-32">
-                <p className="text-sm font-mono text-red-600 break-all">
+              <div className="mb-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg text-left overflow-auto max-h-32">
+                <p className="text-sm font-mono text-red-600 dark:text-red-400 break-all">
                   {error.message}
                 </p>
               </div>
@@ -120,7 +120,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
             {/* Reload Option */}
             <button
               onClick={this.handleReload}
-              className="mt-4 text-sm text-gray-500 hover:text-gray-700 underline"
+              className="mt-4 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 underline"
             >
               Reload the page
             </button>

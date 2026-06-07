@@ -32,6 +32,7 @@ interface GoalActions {
   updateGoal: (id: string, data: Partial<Goal>) => void;
   deleteGoal: (id: string) => void;
   updateProgress: (id: string, value: number) => void;
+  enableAutoTracking: (id: string, workouts: Workout[]) => void;
   completeGoal: (id: string) => void;
   cancelGoal: (id: string) => void;
   reactivateGoal: (id: string) => void;
@@ -157,7 +158,8 @@ export const useGoalStore = create<GoalState & GoalActions>()(
         },
 
         /**
-         * Update the progress/current value of a goal
+         * Manually update the progress/current value of a goal
+         * Marks the goal as manually tracked so automatic workout sync skips it
          */
         updateProgress: (id: string, value: number) => {
           set(
@@ -172,12 +174,31 @@ export const useGoalStore = create<GoalState & GoalActions>()(
                   ...goal,
                   currentValue: newValue,
                   status: isComplete ? 'completed' : goal.status,
+                  isManualProgress: true,
                 };
               }),
             }),
             false,
             'updateProgress'
           );
+        },
+
+        /**
+         * Switch a goal back to automatic tracking and recalculate its
+         * progress from the provided workouts
+         */
+        enableAutoTracking: (id: string, workouts: Workout[]) => {
+          set(
+            (state) => ({
+              goals: state.goals.map((goal) =>
+                goal.id === id ? { ...goal, isManualProgress: false } : goal
+              ),
+            }),
+            false,
+            'enableAutoTracking'
+          );
+
+          get().syncGoalsWithWorkouts(workouts);
         },
 
         /**
@@ -269,8 +290,8 @@ export const useGoalStore = create<GoalState & GoalActions>()(
           set(
             (state) => ({
               goals: state.goals.map((goal) => {
-                // Only sync active goals
-                if (goal.status !== 'active') return goal;
+                // Only sync active goals that are not manually tracked
+                if (goal.status !== 'active' || goal.isManualProgress) return goal;
 
                 // Filter workouts within goal date range
                 const relevantWorkouts = workouts.filter((workout) => {

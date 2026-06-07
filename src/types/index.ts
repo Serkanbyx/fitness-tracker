@@ -55,6 +55,8 @@ export interface Goal {
   endDate: string; // ISO date string
   status: GoalStatus;
   createdAt: string; // ISO datetime string
+  // When true, progress is set manually and excluded from automatic workout sync
+  isManualProgress?: boolean;
 }
 
 /**
