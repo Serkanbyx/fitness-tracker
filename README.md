@@ -18,6 +18,22 @@ A modern, responsive web application for tracking workouts, setting fitness goal
 - **Data Persistence**: Your data is automatically saved to local storage, so you never lose your progress
 - **Responsive Design**: Fully optimized for desktop, tablet, and mobile devices with an intuitive navigation system
 
+## Screenshots
+
+### Dashboard
+
+| Dark Mode | Light Mode |
+| --- | --- |
+| ![Dashboard — Dark Mode](docs/screenshots/dashboard-dark.png) | ![Dashboard — Light Mode](docs/screenshots/dashboard-light.png) |
+
+### Workouts
+
+![Workouts page with logged sessions, filters, and search](docs/screenshots/workouts-dark.png)
+
+### Goals
+
+![Goals page with progress tracking and status filters](docs/screenshots/goals-dark.png)
+
 ## Live Demo
 
 [🚀 View Live Demo](https://fitness-trackerrrrr.netlify.app/dashboard)
